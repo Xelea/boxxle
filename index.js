@@ -11,7 +11,7 @@ const keys = {
 import { Levels } from './level.js'; // Import the level array data from level.js
 
 let levelIndex = 0; // The index of the level to load
-let selectedLevel = Levels[levelIndex]; // Select the level data based on the levelIndex
+let selectedLevel = Levels[levelIndex].map(row => [...row]); // Create a deep copy of the selected level to avoid modifying the original data
 let initialLevel = selectedLevel.map(row => [...row]); // Create a deep copy of the selected level to reset later
 const gameboard = document.getElementById('gameboard'); // Select the gameboard element from the HTML
 
