@@ -35,8 +35,8 @@ gameboard.style.gridTemplateColumns = `repeat(${nbCollumns}, 1fr)`;
 
 const draw = () => {
     gameboard.innerHTML = ''; // Clear the gameboard to make sure there is no duplicate content
-    selectedLevel.forEach((row, rowIndex) => {
-        row.forEach((cell, cellIndex) => {
+    selectedLevel.forEach((row, rowIndex) => { // Iterate through each row of the selected level
+        row.forEach((cell, cellIndex) => { // Iterate through each cell in the row
             const div = document.createElement('div'); // Create a new div for each cell
             div.classList.add('cell'); // Add a class to the div for styling
 
@@ -61,56 +61,56 @@ const draw = () => {
 
 document.addEventListener('keydown', handleKeyDown); // Add an event listener for keydown events
 
-function handleKeyDown(event) {
-    event.preventDefault();
+function handleKeyDown(event) { // Function to handle keydown events
+    event.preventDefault(); // Prevent default action to avoid scrolling or other browser behaviors
 
-    let playerPosition = null;
+    let playerPosition = null; // Variable to store the player's position when the key is pressed
     selectedLevel.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
-            if (cell === 3 || cell === 5) { 
-                playerPosition = [rowIndex, cellIndex];
+            if (cell === 3 || cell === 5) {  // Check if the cell is a player (3) or a player on goal (5)
+                playerPosition = [rowIndex, cellIndex]; // Store the player's position
             }
         });
     });
 
-    if (!playerPosition) return;
+    if (!playerPosition) return; // If no player position is found, the function exits
 
-    let directions;
-    switch (event.keyCode) {
-        case 37: directions = [0, -1]; break;
-        case 38: directions = [-1, 0]; break;
-        case 39: directions = [0, 1]; break;
-        case 40: directions = [1, 0]; break;
+    let directions; // Variable to store the direction based on the key pressed
+    switch (event.keyCode) { // Switch statement to determine the direction based on the key pressed
+        case 37: directions = [0, -1]; break; // Left arrow key
+        case 38: directions = [-1, 0]; break; // Up arrow key
+        case 39: directions = [0, 1]; break; // Right arrow key
+        case 40: directions = [1, 0]; break; // Down arrow key
         default: return;
     }
 
-    const [posY, posX] = playerPosition;
-    const [dirY, dirX] = directions;
-    const newY = posY + dirY;
-    const newX = posX + dirX;
-    const nextCell = selectedLevel[newY]?.[newX];
+    const [posY, posX] = playerPosition; // Affectation of the player's position to posY and posX
+    const [dirY, dirX] = directions; // Affectation of the direction to dirY and dirX
+    const newY = posY + dirY; // Calculate the new Y position based on the direction
+    const newX = posX + dirX; // Calculate the new X position based on the direction
+    const nextCell = selectedLevel[newY]?.[newX]; // Get the next cell based on the new position, using optional chaining to avoid errors if out of bounds
 
-    if (nextCell === undefined || nextCell === 1) return;
+    if (nextCell === undefined || nextCell === 1) return; // If the next cell is undefined (out of bounds) or a wall (1), exit the function
 
-    if (nextCell === 0 || nextCell === 4) {
-        selectedLevel[posY][posX] = (selectedLevel[posY][posX] === 5) ? 4 : 0;
-        selectedLevel[newY][newX] = (nextCell === 4) ? 5 : 3;
+    if (nextCell === 0 || nextCell === 4) { // If the next cell is empty (0) or a goal (4)
+        selectedLevel[posY][posX] = (selectedLevel[posY][posX] === 5) ? 4 : 0; // Reset the current player's position to empty (0) or goal (4) if it was on a goal
+        selectedLevel[newY][newX] = (nextCell === 4) ? 5 : 3; // Move the player to the new position, setting it to player on goal (5) if it was on a goal, or just player (3) otherwise
         return;
     }
 
-    if (nextCell === 2 || nextCell === 6) {
-        const boxNewY = newY + dirY;
-        const boxNewX = newX + dirX;
-        const boxNextCell = selectedLevel[boxNewY]?.[boxNewX];
+    if (nextCell === 2 || nextCell === 6) { // If the next cell is a box (2) or a box on goal (6)
+        const boxNewY = newY + dirY; // Calculate the new Y position for the box based on the direction
+        const boxNewX = newX + dirX; // Calculate the new X position for the box based on the direction
+        const boxNextCell = selectedLevel[boxNewY]?.[boxNewX]; // Get the next cell for the box
 
         if (boxNextCell === 0 || boxNextCell === 4) {
-            selectedLevel[boxNewY][boxNewX] = (boxNextCell === 4) ? 6 : 2;
-            selectedLevel[newY][newX] = (nextCell === 6) ? 5 : 3;
-            selectedLevel[posY][posX] = (selectedLevel[posY][posX] === 5) ? 4 : 0;
+            selectedLevel[boxNewY][boxNewX] = (boxNextCell === 4) ? 6 : 2; // Move the box to the new position, setting it to box on goal (6) if it was on a goal, or just box (2) otherwise
+            selectedLevel[newY][newX] = (nextCell === 6) ? 5 : 3; // Move the player to the new position, setting it to player on goal (5) if it was on a goal, or just player (3) otherwise
+            selectedLevel[posY][posX] = (selectedLevel[posY][posX] === 5) ? 4 : 0; // Reset the current player's position to empty (0) or goal (4) if it was on a goal
         }
     }
 
-    if (checkVictory()) {
+    if (checkVictory()) { // Check if the player has completed the level
         if (levelIndex < Levels.length - 1) {
             alert("congratulations, you completed the level! Loading next level...");
             loadLevel(levelIndex + 1); // Load the next level if available
@@ -121,14 +121,14 @@ function handleKeyDown(event) {
     }
 }
 
-document.getElementById('resetBtn').addEventListener('click', () => {
-    loadLevel(levelIndex);
+document.getElementById('resetBtn').addEventListener('click', () => { // Add an event listener for the reset button
+    loadLevel(levelIndex); // Reset the current level to its initial state
 });
 
-function checkVictory() {
-    for (let rowIndex = 0; rowIndex < selectedLevel.length; rowIndex++) {
-        for (let cellIndex = 0; cellIndex < selectedLevel[rowIndex].length; cellIndex++) {
-            if (initialLevel[rowIndex][cellIndex] === 4 && selectedLevel[rowIndex][cellIndex] !== 6) {
+function checkVictory() { // Function to check if the player has completed the level
+    for (let rowIndex = 0; rowIndex < selectedLevel.length; rowIndex++) { // Iterate through each row of the selected level
+        for (let cellIndex = 0; cellIndex < selectedLevel[rowIndex].length; cellIndex++) { // Iterate through each cell in the row
+            if (initialLevel[rowIndex][cellIndex] === 4 && selectedLevel[rowIndex][cellIndex] !== 6) { // If the initial level had a goal (4) and the current level does not have a box on that goal (6)
                 return false;
             }
         }
@@ -136,10 +136,10 @@ function checkVictory() {
     return true;
 }
 
-function loadLevel(index) {
-    levelIndex = index;
-    selectedLevel = Levels[levelIndex].map(row => [...row]);
-    initialLevel = Levels[levelIndex].map(row => [...row]);
+function loadLevel(index) { // Function to load a level based on the index
+    levelIndex = index; // Update the level index to the new level
+    selectedLevel = Levels[levelIndex].map(row => [...row]); // Create a deep copy of the new level to avoid modifying the original data
+    initialLevel = Levels[levelIndex].map(row => [...row]); // Create a deep copy of the initial level for resetting later
 }
 
 draw(); // Initial draw call to render the gameboard
